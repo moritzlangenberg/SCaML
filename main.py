@@ -179,6 +179,26 @@ for n in range(0, numberOfPairs):
 error3 = np.divide(error3, numberOfPairs)
 print("E(g3) = {}".format(error3))
 
+print("iv)")
+for n in range(0, numberOfPairs):
+    decisionProb = np.zeros(5)
+    for iterC in range(0, 5):
+        if pCtable[iterC] == 0:
+             decisionProb[iterC] = pCtable[iterC]
+        else:
+            decisionProb[iterC] = (pCX1X2table[iterC, x_1[n], x_2[n]] / pCtable[iterC])
+    maxC = np.max(decisionProb)
+    # maxC is the choosen class from decicion rule
+    # now we add the error
+    for iterC in range(0, 5):
+        if iterC == c[n]:
+            error4 += (decisionProb[iterC] - 1) ** 2
+        else:
+            error4 += (decisionProb[iterC]) ** 2
+error4 = np.divide(error4, numberOfPairs)
+print("E(g3) = {}".format(error4))
+
+
 
 
 
