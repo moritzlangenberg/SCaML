@@ -96,22 +96,6 @@ def pCX2(c_hat, x2):
             result += pCX1X2table[c_hat, x1, x2]
     return result
 
-'''
-def pX1(x1):
-    pX1 = (x_1 == x1).sum()
-    pX1 = pX1/numberOfPairs
-    return pX1
-
-def pX2(x2):
-    pX2 = (x_2 == x2).sum()
-    pX2 = pX2/numberOfPairs
-    return pX2
-
-def pC(cTemp):
-    pC = (c == cTemp).sum()
-    pC = pC/numberOfPairs
-    return pC
-'''
 
 pX1table = np.array([pX1(i) for i in range(0, 10)])
 pX2table = np.array([pX2(i) for i in range(0, 10)])
@@ -121,7 +105,7 @@ pCX2table = np.array([pCX2(i, j) for i in range(0, 5) for j in range(0, 10)]).re
 pX1X2table = np.array([pX1X2(i, j) for i in range(0, 10) for j in range(0, 10)]).reshape(10, 10)
 
 
-
+'''
 print("i)")
 for n in range(0, numberOfPairs):
     decisionProb = np.zeros(5)
@@ -130,7 +114,7 @@ for n in range(0, numberOfPairs):
              decisionProb[iterC] = pCtable[iterC]
         else:
             decisionProb[iterC] = (pCX1table[iterC, x_1[n]] / pX1table[x_1[n]])
-    maxC = np.max(decisionProb)
+    maxC = np.argmax(decisionProb)
     # maxC is the choosen class from decicion rule
     # now we add the error
     for iterC in range(0, 5):
@@ -140,44 +124,92 @@ for n in range(0, numberOfPairs):
             error1 += (decisionProb[iterC]) ** 2
 error1 = np.divide(error1, numberOfPairs)
 print("E(g1) = {}".format(error1))
+print("i) Test")
+error1 = 0
+for iterX1 in range(0, 10):
+    for iterX2 in range(0, 10):
+        if pX1X2table[x_1[n], x_2[n]] != 0:
+            if pX1table[x_1[n]] != 0:
+                error1 += pX1X2table[x_1[n], x_2[n]] \
+                            * (1 - ((pCX1table[c[n], x_1[n]])/pX1table[x_1[n]])/ \
+                            pX1X2table[x_1[n], x_2[n]])
+            else:
+                error1 += pX1X2table[x_1[n], x_2[n]] \
+                            * (1 - pC[c[n]])
+        else:
+            error1 += pX1X2table[x_1[n], x_2[n]] \
+                      * (1 - pC[c[n]])
+
+print("E(g1) = {}".format(error1))
+
+print("i) Test 2")
+error1 = 0
+for iterX1 in range(0, 10):
+    for iterX2 in range(0, 10):
+        for iterC in range(0, 5):
+            if pX1table[x_1[n]] == 0:
+                decisionProb[iterC] = pCtable[iterC]
+            else:
+                decisionProb[iterC] = (pCX1table[iterC, x_1[n]] / pX1table[x_1[n]])
+        maxC = np.argmax(decisionProb)
+        if pX1X2table[iterX1, iterX2] != 0:
+            error1 += pX1X2table[iterX1, iterX2] * (1 - pCX1X2table[maxC, iterX1, iterX2]/pX1X2table[iterX1, iterX2])
+        else:
+            error1 += pX1X2table[iterX1, iterX2] * (1 - pCtable[maxC])
+
+
+print("E(g1) = {}".format(error1))
+'''
+
+print("i")
+decisionProb = np.zeros(5)
+error1 = 0
+for iterX1 in range(0, 10):
+        for iterC in range(0, 5):
+            if pX1table[iterX1] == 0:
+                decisionProb[iterC] = pCtable[iterC]
+            else:
+                decisionProb[iterC] = (pCX1table[iterC, iterX1] / pX1table[iterX1])
+        maxC = np.argmax(decisionProb)
+        if pX1table[iterX1] != 0:
+            error1 += pX1table[iterX1] * (1 - pCX1table[maxC, iterX1]/pX1table[iterX1])
+        else:
+            error1 += pX1table[iterX1] * (1 - pCtable[maxC])
+print("E(g1) = {}".format(error1))
+
 
 print("ii)")
-for n in range(0, numberOfPairs):
-    decisionProb = np.zeros(5)
-    for iterC in range(0, 5):
-        if pX2table[x_1[n]] == 0:
-             decisionProb[iterC] = pCtable[iterC]
+decisionProb = np.zeros(5)
+error1 = 0
+for iterX2 in range(0, 10):
+        for iterC in range(0, 5):
+            if pX2table[iterX2] == 0:
+                decisionProb[iterC] = pCtable[iterC]
+            else:
+                decisionProb[iterC] = (pCX2table[iterC, iterX2] / pX2table[iterX2])
+        maxC = np.argmax(decisionProb)
+        if pX2table[iterX2] != 0:
+            error1 += pX2table[iterX2] * (1 - pCX2table[maxC, iterX2]/pX2table[iterX2])
         else:
-            decisionProb[iterC] = (pCX2table[iterC, x_2[n]] / pX2table[x_2[n]])
-    maxC = np.max(decisionProb)
-    # maxC is the choosen class from decicion rule
-    # now we add the error
-    for iterC in range(0, 5):
-        if iterC == c[n]:
-            error2 += (decisionProb[iterC] - 1) ** 2
-        else:
-            error2 += (decisionProb[iterC]) ** 2
-error2 = np.divide(error2, numberOfPairs)
-print("E(g2) = {}".format(error2))
+            error1 += pX2table[iterX2] * (1 - pCtable[maxC])
+print("E(g2) = {}".format(error1))
 
 print("iii)")
-for n in range(0, numberOfPairs):
-    decisionProb = np.zeros(5)
-    for iterC in range(0, 5):
-        if pX1X2table[x_1[n], x_2[n]] == 0:
-             decisionProb[iterC] = pCtable[iterC]
-        else:
-            decisionProb[iterC] = (pCX1X2table[iterC, x_1[n], x_2[n]] / pX1X2table[x_1[n], x_2[n]])
-    maxC = np.max(decisionProb)
-    # maxC is the choosen class from decicion rule
-    # now we add the error
-    for iterC in range(0, 5):
-        if iterC == c[n]:
-            error3 += (decisionProb[iterC] - 1) ** 2
-        else:
-            error3 += (decisionProb[iterC]) ** 2
-error3 = np.divide(error3, numberOfPairs)
-print("E(g3) = {}".format(error3))
+decisionProb = np.zeros(5)
+error1 = 0
+for iterX1 in range(0, 10):
+    for iterX2 in range(0, 10):
+            for iterC in range(0, 5):
+                if pX1X2table[iterX1, iterX2] == 0:
+                    decisionProb[iterC] = pCtable[iterC]
+                else:
+                    decisionProb[iterC] = (pCX1X2table[iterC, iterX1, iterX2] / pX1X2table[iterX1, iterX2])
+            maxC = np.argmax(decisionProb)
+            if pX1X2table[iterX1, iterX2] != 0:
+                error1 += pX1X2table[iterX1, iterX2] * (1 - pCX1X2table[maxC, iterX1, iterX2]/pX1X2table[iterX1, iterX2])
+            else:
+                error1 += pX1X2table[iterX1, iterX2] * (1 - pCtable[maxC])
+print("E(g2) = {}".format(error1))
 
 print("iv)")
 for n in range(0, numberOfPairs):
@@ -187,16 +219,23 @@ for n in range(0, numberOfPairs):
              decisionProb[iterC] = pCtable[iterC]
         else:
             decisionProb[iterC] = (pCX1X2table[iterC, x_1[n], x_2[n]] / pCtable[iterC])
-    maxC = np.max(decisionProb)
-    # maxC is the choosen class from decicion rule
-    # now we add the error
-    for iterC in range(0, 5):
-        if iterC == c[n]:
-            error4 += (decisionProb[iterC] - 1) ** 2
-        else:
-            error4 += (decisionProb[iterC]) ** 2
-error4 = np.divide(error4, numberOfPairs)
-print("E(g3) = {}".format(error4))
+    maxC = np.argmax(decisionProb)
+
+decisionProb = np.zeros(5)
+error1 = 0
+for iterX1 in range(0, 10):
+    for iterX2 in range(0, 10):
+            for iterC in range(0, 5):
+                if pX1X2table[iterX1, iterX2] == 0:
+                    decisionProb[iterC] = pCtable[iterC]
+                else:
+                    decisionProb[iterC] = (pCX1X2table[iterC, iterX1, iterX2] / pCtable[iterC])
+            maxC = np.argmax(decisionProb)
+            if pX1X2table[iterX1, iterX2] != 0:
+                error1 += pX1X2table[iterX1, iterX2] * (1 - pCX1X2table[maxC, iterX1, iterX2]/pX1X2table[iterX1, iterX2])
+            else:
+                error1 += pX1X2table[iterX1, iterX2] * (1 - pCtable[maxC])
+print("E(g2) = {}".format(error1))
 
 
 
